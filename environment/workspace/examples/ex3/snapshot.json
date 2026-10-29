@@ -1,0 +1,3115 @@
+{
+ "accounts": {
+  "789637192934": {
+   "users": {
+    "alice": {
+     "tags": {},
+     "groups": [],
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "*",
+         "Condition": {
+          "ArnEquals": {
+           "aws:PrincipalArn": "arn:aws:iam::*:role/team/*"
+          }
+         }
+        },
+        {
+         "Effect": "Allow",
+         "Action": [
+          "kms:Decrypt",
+          "kms:ScheduleKeyDeletion"
+         ],
+         "Resource": "arn:aws:kms:*:789637192934:key/*"
+        },
+        {
+         "Effect": "Allow",
+         "Action": [
+          "dynamodb:GetItem",
+          "dynamodb:DeleteItem"
+         ],
+         "Resource": "arn:aws:s3:::data-2934-27/secret/keys.txt"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      {
+       "Statement": [
+        {
+         "Effect": "Deny",
+         "Action": "*",
+         "Resource": "*",
+         "Condition": {
+          "StringNotEqualsIfExists": {
+           "aws:RequestedRegion": "ap-south-1"
+          }
+         }
+        },
+        {
+         "Effect": "Deny",
+         "Action": "s3:DeleteObject",
+         "Resource": "*",
+         "Condition": {
+          "Bool": {
+           "aws:MultiFactorAuthPresent": "false"
+          }
+         }
+        },
+        {
+         "Effect": "Deny",
+         "Action": "*",
+         "Resource": "*",
+         "Condition": {
+          "NotIpAddress": {
+           "aws:SourceIp": [
+            "10.0.0.0/8",
+            "172.16.0.0/12"
+           ]
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [
+      "arn:aws:iam::789637192934:policy/Shared"
+     ]
+    },
+    "bob": {
+     "tags": {},
+     "groups": [
+      "devs"
+     ],
+     "policies": [],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::789637192934:policy/NoSuchBoundary"
+    },
+    "carol": {
+     "tags": {
+      "team": "green"
+     },
+     "groups": [
+      "auditors"
+     ],
+     "policies": [],
+     "managed_policies": []
+    },
+    "dave": {
+     "tags": {
+      "team": "blue"
+     },
+     "groups": [],
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": [
+          "sqs:SendMessage",
+          "sqs:ReceiveMessage"
+         ],
+         "Resource": "arn:aws:sqs:*:789637192934:jobs"
+        },
+        {
+         "Effect": "Allow",
+         "Action": "secretsmanager:GetSecretValue",
+         "Resource": "arn:aws:secretsmanager:ap-south-1:789637192934:secret:db/password-??????"
+        },
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "*",
+         "Condition": {
+          "ArnEquals": {
+           "aws:PrincipalArn": "arn:aws:iam::*:role/team/*"
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:*",
+         "Resource": "*",
+         "Condition": {
+          "DateLessThan": {
+           "aws:CurrentTime": "2027-01-01T00:00:00Z"
+          }
+         }
+        },
+        {
+         "Effect": "Allow",
+         "Action": [
+          "s3:GetObject",
+          "s3:PutObject"
+         ],
+         "Resource": "arn:aws:s3:::data-3137-240/homes/${aws:username}/*"
+        },
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "*",
+         "Condition": {
+          "ArnEquals": {
+           "aws:PrincipalArn": "arn:aws:iam::*:role/team/*"
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": []
+    }
+   },
+   "groups": {
+    "devs": {
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Deny",
+         "Action": "sqs:*",
+         "Resource": "*",
+         "Condition": {
+          "ForAllValues:StringLike": {
+           "aws:TagKeys": [
+            "temp-*"
+           ]
+          }
+         }
+        },
+        {
+         "Effect": "Deny",
+         "Action": "kms:*",
+         "Resource": "*",
+         "Condition": {
+          "Null": {
+           "aws:ResourceTag/team": "true"
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [
+      "arn:aws:iam::789637192934:policy/Shared"
+     ]
+    },
+    "auditors": {
+     "policies": [],
+     "managed_policies": [
+      "arn:aws:iam::aws:policy/ReadOnlyAccess"
+     ]
+    }
+   },
+   "roles": {
+    "ops-admin": {
+     "path": "/",
+     "tags": {},
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "NotAction": [
+          "iam:*",
+          "kms:*"
+         ],
+         "Resource": "*"
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [
+      "arn:aws:iam::aws:policy/AdministratorAccess"
+     ],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": [
+          "arn:aws:iam::407192745917:user/bob"
+         ]
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "Bool": {
+          "aws:MultiFactorAuthPresent": "true"
+         },
+         "StringEquals": {
+          "aws:PrincipalAccount": [
+           "789637192934",
+           "407192745917"
+          ]
+         }
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "deploy": {
+     "path": "/team/",
+     "tags": {
+      "team": "red"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Deny",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::*/secret/*",
+         "Condition": {
+          "StringNotEquals": {
+           "aws:PrincipalTag/clearance": "high"
+          }
+         }
+        },
+        {
+         "Effect": "Deny",
+         "Action": "dynamodb:*",
+         "Resource": "*",
+         "Condition": {
+          "ForAnyValue:StringEquals": {
+           "dynamodb:Attributes": [
+            "ssn",
+            "card"
+           ]
+          }
+         }
+        },
+        {
+         "Effect": "Deny",
+         "Action": "*",
+         "Resource": "*",
+         "Condition": {
+          "StringNotEqualsIfExists": {
+           "aws:RequestedRegion": "ap-south-1"
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::789637192934:policy/S3Boundary",
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": [
+          "arn:aws:iam::789637192934:user/bob"
+         ]
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ]
+     }
+    },
+    "reader": {
+     "path": "/",
+     "tags": {},
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::data-2934-27/a${*}b/*"
+        },
+        {
+         "Effect": "Deny",
+         "Action": "s3:DeleteObject",
+         "Resource": "*",
+         "Condition": {
+          "Bool": {
+           "aws:MultiFactorAuthPresent": "false"
+          }
+         }
+        },
+        {
+         "Effect": "Allow",
+         "Action": "s3:?etObject",
+         "Resource": [
+          "arn:aws:s3:::data-2934-27",
+          "arn:aws:s3:::data-2934-27*"
+         ]
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::789637192934:policy/S3Boundary",
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:role/ops-admin"
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "Service": "lambda.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "auditor": {
+     "path": "/team/",
+     "tags": {
+      "team": "red"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "*",
+         "Condition": {
+          "ArnEquals": {
+           "aws:PrincipalArn": "arn:aws:iam::*:role/team/*"
+          }
+         }
+        },
+        {
+         "Effect": "Allow",
+         "Action": [
+          "s3:GetObject",
+          "s3:PutObject"
+         ],
+         "Resource": "arn:aws:s3:::data-2934-27/homes/${aws:username}/*"
+        },
+        {
+         "Effect": "Deny",
+         "Action": "kms:*",
+         "Resource": "*",
+         "Condition": {
+          "Null": {
+           "aws:ResourceTag/team": "true"
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalOrgID": "o-p9ntzv3wlz"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "Bool": {
+          "aws:MultiFactorAuthPresent": "true"
+         },
+         "StringEquals": {
+          "aws:PrincipalAccount": [
+           "789637192934",
+           "407192745917"
+          ]
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:root"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "svc-lambda": {
+     "path": "/service/",
+     "tags": {
+      "team": "red"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "secretsmanager:GetSecretValue",
+         "Resource": "arn:aws:secretsmanager:*:789637192934:secret:db/*"
+        },
+        {
+         "Effect": "Deny",
+         "Action": "s3:DeleteObject",
+         "Resource": "*",
+         "Condition": {
+          "BoolIfExists": {
+           "aws:MultiFactorAuthPresent": false
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::789637192934:policy/S3Boundary",
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "Service": "lambda.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::789637192934:assumed-role/deploy/ci"
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Deny",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalTag/team": "red"
+         }
+        }
+       }
+      ]
+     }
+    }
+   },
+   "managed_policies": {
+    "arn:aws:iam::789637192934:policy/S3Boundary": {
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": [
+        "s3:*",
+        "sts:AssumeRole"
+       ],
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "arn:aws:iam::789637192934:policy/TeamBoundary": {
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "NotAction": "iam:*",
+       "Resource": "*"
+      },
+      {
+       "Effect": "Deny",
+       "Action": "s3:DeleteObject",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "arn:aws:iam::789637192934:policy/Shared": {
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": "s3:GetObject",
+       "Resource": "arn:aws:s3:::data-2934-27/*"
+      },
+      {
+       "Effect": "Allow",
+       "Action": "dynamodb:*",
+       "Resource": "arn:aws:dynamodb:*:*:table/Orders",
+       "Condition": {
+        "StringEquals": {
+         "dynamodb:Attributes": [
+          "id",
+          "status",
+          "total"
+         ]
+        }
+       }
+      },
+      {
+       "Effect": "Allow",
+       "Action": [
+        "kms:Decrypt",
+        "kms:ScheduleKeyDeletion"
+       ],
+       "Resource": "arn:aws:kms:*:789637192934:key/*"
+      }
+     ]
+    }
+   },
+   "resources": [
+    {
+     "arn": "arn:aws:s3:::data-2934-27",
+     "tags": {
+      "team": "blue",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::407192745917:assumed-role/auditor/hop"
+        },
+        "Action": "*"
+       },
+       {
+        "Effect": "Deny",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "*",
+        "Condition": {
+         "Bool": {
+          "aws:SecureTransport": "false"
+         }
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-2934-27/reports/q1.csv",
+     "tags": {},
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "sqs:SendMessage",
+        "Resource": "*",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalOrgID": "o-p9ntzv3wlz"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:s3:::data-2934-27/public/*"
+       }
+      ],
+      "Version": "2008-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-2934-27/homes/alice/notes.txt",
+     "tags": {
+      "team": "red",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:s3:::data-2934-27/public/*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:user/carol"
+        },
+        "Action": "*",
+        "Resource": "*"
+       },
+       {
+        "Effect": "Deny",
+        "NotPrincipal": {
+         "AWS": [
+          "arn:aws:iam::789637192934:role/team/deploy",
+          "arn:aws:iam::789637192934:user/alice"
+         ]
+        },
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-2934-27/secret/*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-2934-27/homes/bob/notes.txt",
+     "tags": {
+      "team": "green",
+      "env": "prod"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-2934-27/public/index.html",
+     "tags": {}
+    },
+    {
+     "arn": "arn:aws:s3:::data-2934-27/secret/keys.txt",
+     "tags": {
+      "team": "red",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::407192745917:role/service/svc-lambda"
+        },
+        "Action": "*",
+        "Resource": "*"
+       },
+       {
+        "Effect": "Deny",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "*",
+        "Condition": {
+         "Bool": {
+          "aws:SecureTransport": "false"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "407192745917"
+        },
+        "Action": "kms:*",
+        "Resource": "*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-2934-27/a*b/literal.txt",
+     "tags": {
+      "team": "blue",
+      "env": "dev"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::407192745917:root"
+        },
+        "Action": "sqs:SendMessage",
+        "Resource": "arn:aws:s3:::data-2934-27/*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::407192745917:assumed-role/auditor/hop"
+        },
+        "Action": "*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:sqs:ap-south-1:789637192934:jobs",
+     "tags": {
+      "team": "green",
+      "env": "prod"
+     }
+    },
+    {
+     "arn": "arn:aws:kms:ap-south-1:789637192934:key/a3b06cce-91db-9174-e63e-1c51a071d4d8",
+     "tags": {},
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::407192745917:root"
+        },
+        "Action": "sqs:SendMessage",
+        "Resource": "arn:aws:kms:ap-south-1:789637192934:key/*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::789637192934:assumed-role/auditor/ci"
+        },
+        "Action": "*"
+       }
+      ]
+     }
+    },
+    {
+     "arn": "arn:aws:dynamodb:ap-south-1:789637192934:table/Orders",
+     "tags": {
+      "team": "red",
+      "env": "dev"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "sqs:SendMessage",
+        "Resource": "*",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalOrgID": "o-p9ntzv3wlz"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:role/team/auditor"
+        },
+        "Action": "*",
+        "Resource": "*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:secretsmanager:ap-south-1:789637192934:secret:db/password-Zz09Qe",
+     "tags": {
+      "team": "red",
+      "env": "dev"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::789637192934:assumed-role/auditor/hop"
+        },
+        "Action": "*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    }
+   ]
+  },
+  "967247113137": {
+   "users": {
+    "alice": {
+     "tags": {
+      "team": "blue"
+     },
+     "groups": [
+      "auditors"
+     ],
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "NotAction": [
+          "iam:*",
+          "kms:*"
+         ],
+         "Resource": "*"
+        },
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::data-3137-240/a${*}b/*"
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [
+      "arn:aws:iam::967247113137:policy/Shared"
+     ],
+     "permissions_boundary": "arn:aws:iam::967247113137:policy/NoSuchBoundary"
+    },
+    "bob": {
+     "tags": {},
+     "groups": [],
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Deny",
+         "NotResource": [
+          "arn:aws:s3:::data-3137-240",
+          "arn:aws:s3:::data-3137-240/*"
+         ],
+         "Action": "s3:*"
+        },
+        {
+         "Effect": "Deny",
+         "Action": "dynamodb:*",
+         "Resource": "*",
+         "Condition": {
+          "ForAnyValue:StringEquals": {
+           "dynamodb:Attributes": [
+            "ssn",
+            "card"
+           ]
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": [
+          "sqs:SendMessage",
+          "sqs:ReceiveMessage"
+         ],
+         "Resource": "arn:aws:sqs:*:*:jobs"
+        }
+       ]
+      }
+     ],
+     "managed_policies": []
+    },
+    "carol": {
+     "tags": {
+      "team": "green"
+     },
+     "groups": [],
+     "policies": [],
+     "managed_policies": [
+      "arn:aws:iam::967247113137:policy/Shared"
+     ]
+    },
+    "dave": {
+     "tags": {
+      "team": "green",
+      "clearance": "low"
+     },
+     "groups": [
+      "auditors"
+     ],
+     "policies": [],
+     "managed_policies": [
+      "arn:aws:iam::967247113137:policy/Shared"
+     ]
+    }
+   },
+   "groups": {
+    "devs": {
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::data-3137-240/homes/${aws:username, 'alice'}/*"
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [
+      "arn:aws:iam::967247113137:policy/Shared"
+     ]
+    },
+    "auditors": {
+     "policies": [],
+     "managed_policies": [
+      "arn:aws:iam::aws:policy/ReadOnlyAccess"
+     ]
+    }
+   },
+   "roles": {
+    "ops-admin": {
+     "path": "/",
+     "tags": {
+      "team": "red"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "sqs:*",
+         "Resource": "*",
+         "Condition": {
+          "IpAddress": {
+           "aws:SourceIp": "10.0.0.0/8"
+          }
+         }
+        },
+        {
+         "Effect": "Allow",
+         "Action": [
+          "kms:Decrypt",
+          "kms:ScheduleKeyDeletion"
+         ],
+         "Resource": "arn:aws:kms:*:967247113137:key/*"
+        },
+        {
+         "Effect": "Deny",
+         "Action": "*",
+         "Resource": "*",
+         "Condition": {
+          "StringNotEqualsIfExists": {
+           "aws:RequestedRegion": "ap-south-1"
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": [
+          "arn:aws:iam::967247113137:user/carol"
+         ]
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "deploy": {
+     "path": "/team/",
+     "tags": {},
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "dynamodb:*",
+         "Resource": "arn:aws:dynamodb:*:*:table/Orders",
+         "Condition": {
+          "ForAllValues:StringEquals": {
+           "dynamodb:Attributes": [
+            "id",
+            "status",
+            "total"
+           ]
+          }
+         }
+        },
+        {
+         "Effect": "Allow",
+         "Action": [
+          "dynamodb:GetItem",
+          "dynamodb:DeleteItem"
+         ],
+         "Resource": "arn:aws:secretsmanager:ap-south-1:967247113137:secret:db/password-Zz09Qe"
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::407192745917:root"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "reader": {
+     "path": "/",
+     "tags": {
+      "team": "blue"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:?etObject",
+         "Resource": [
+          "arn:aws:s3:::data-3137-240",
+          "arn:aws:s3:::data-3137-240*"
+         ]
+        },
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::data-3137-240/homes/${aws:username, 'alice'}/*"
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "Service": "lambda.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": [
+          "arn:aws:iam::407192745917:user/bob"
+         ]
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "Service": "lambda.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "auditor": {
+     "path": "/team/",
+     "tags": {
+      "team": "green"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::data-3137-240/a${*}b/*"
+        },
+        {
+         "Effect": "Allow",
+         "Action": [
+          "sqs:SendMessage",
+          "sqs:ReceiveMessage"
+         ],
+         "Resource": "arn:aws:sqs:*:*:jobs"
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "Bool": {
+          "aws:MultiFactorAuthPresent": "true"
+         },
+         "StringEquals": {
+          "aws:PrincipalAccount": [
+           "967247113137",
+           "164555566288"
+          ]
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::967247113137:role/ops-admin"
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "Bool": {
+          "aws:MultiFactorAuthPresent": "true"
+         },
+         "StringEquals": {
+          "aws:PrincipalAccount": [
+           "967247113137",
+           "164555566288"
+          ]
+         }
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "svc-lambda": {
+     "path": "/service/",
+     "tags": {
+      "team": "green"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::data-3137-240/*"
+        },
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::data-3137-240/homes/${aws:username, 'alice'}/*"
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::967247113137:assumed-role/reader/hop"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    }
+   },
+   "managed_policies": {
+    "arn:aws:iam::967247113137:policy/S3Boundary": {
+     "Statement": {
+      "Effect": "Allow",
+      "Action": [
+       "s3:*",
+       "sts:AssumeRole"
+      ],
+      "Resource": "*"
+     },
+     "Version": "2012-10-17"
+    },
+    "arn:aws:iam::967247113137:policy/TeamBoundary": {
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "NotAction": "iam:*",
+       "Resource": "*"
+      },
+      {
+       "Effect": "Deny",
+       "Action": "s3:DeleteObject",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "arn:aws:iam::967247113137:policy/Shared": {
+     "Statement": [
+      {
+       "Effect": "Deny",
+       "Action": "sqs:*",
+       "Resource": "*",
+       "Condition": {
+        "ForAllValues:StringLike": {
+         "aws:TagKeys": [
+          "temp-*"
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "resources": [
+    {
+     "arn": "arn:aws:s3:::data-3137-240",
+     "tags": {
+      "team": "red",
+      "env": "dev"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::967247113137:assumed-role/reader/who"
+        },
+        "Action": "*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:s3:::data-3137-240/public/*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-3137-240/reports/q1.csv",
+     "tags": {
+      "team": "red",
+      "env": "dev"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::164555566288:assumed-role/auditor/who"
+        },
+        "Action": "*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "sqs:SendMessage",
+        "Resource": "arn:aws:s3:::data-3137-240/*",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalOrgID": "o-p9ntzv3wlz"
+         }
+        }
+       },
+       {
+        "Effect": "Deny",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-3137-240/*",
+        "Condition": {
+         "Bool": {
+          "aws:SecureTransport": "false"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::164555566288:user/carol"
+        },
+        "Action": "kms:Decrypt",
+        "Condition": {
+         "StringEqualsIgnoreCase": {
+          "aws:PrincipalTag/team": "RED"
+         }
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-3137-240/homes/alice/notes.txt",
+     "tags": {
+      "team": "green",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::967247113137:root"
+        },
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:s3:::data-3137-240/homes/alice/notes.txt"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-3137-240/homes/bob/notes.txt",
+     "tags": {
+      "team": "blue",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::967247113137:assumed-role/auditor/s1"
+        },
+        "Action": "*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-3137-240/public/index.html",
+     "tags": {
+      "team": "red",
+      "env": "prod"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-3137-240/secret/keys.txt",
+     "tags": {
+      "team": "green",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Deny",
+        "Principal": {
+         "AWS": "arn:aws:iam::164555566288:root"
+        },
+        "Action": "sqs:DeleteQueue",
+        "Resource": "*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::164555566288:assumed-role/reader/who"
+        },
+        "Action": "*"
+       },
+       {
+        "Effect": "Deny",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "*",
+        "Condition": {
+         "Bool": {
+          "aws:SecureTransport": "false"
+         }
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-3137-240/a*b/literal.txt",
+     "tags": {
+      "team": "red",
+      "env": "dev"
+     },
+     "policy": {
+      "Statement": {
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": "arn:aws:iam::164555566288:user/bob"
+       },
+       "Action": "dynamodb:GetItem",
+       "Condition": {
+        "StringEqualsIgnoreCase": {
+         "aws:PrincipalTag/team": "green"
+        }
+       }
+      },
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:sqs:ap-south-1:967247113137:jobs",
+     "tags": {},
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::967247113137:assumed-role/reader/who"
+        },
+        "Action": "*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::967247113137:assumed-role/reader/hop"
+        },
+        "Action": "*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:s3:::data-3137-240/public/*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:kms:ap-south-1:967247113137:key/25220f83-16aa-f3d9-330e-845f1139644e",
+     "tags": {
+      "team": "blue",
+      "env": "dev"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Deny",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "arn:aws:kms:ap-south-1:967247113137:key/25220f83-16aa-f3d9-330e-845f1139644e",
+        "Condition": {
+         "Bool": {
+          "aws:SecureTransport": "false"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:s3:::data-3137-240/public/*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::967247113137:assumed-role/deploy/s1"
+        },
+        "Action": "*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:dynamodb:ap-south-1:967247113137:table/Orders",
+     "tags": {},
+     "policy": {
+      "Statement": {
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Action": "s3:GetObject",
+       "Resource": "arn:aws:s3:::data-3137-240/public/*"
+      },
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:secretsmanager:ap-south-1:967247113137:secret:db/password-Zz09Qe",
+     "tags": {
+      "team": "red",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::164555566288:role/team/auditor"
+        },
+        "Action": "*",
+        "Resource": "*"
+       },
+       {
+        "Effect": "Deny",
+        "NotPrincipal": {
+         "AWS": [
+          "arn:aws:iam::967247113137:role/team/deploy",
+          "arn:aws:iam::967247113137:user/alice"
+         ]
+        },
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-3137-240/secret/*"
+       },
+       {
+        "Effect": "Deny",
+        "Principal": {
+         "AWS": "arn:aws:iam::164555566288:root"
+        },
+        "Action": "kms:ScheduleKeyDeletion",
+        "Resource": "*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "*",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalOrgID": "o-p9ntzv3wlz"
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "164555566288": {
+   "users": {
+    "alice": {
+     "tags": {
+      "team": "green"
+     },
+     "groups": [
+      "auditors",
+      "ghosts"
+     ],
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": [
+          "kms:Decrypt",
+          "kms:ScheduleKeyDeletion"
+         ],
+         "Resource": "arn:aws:kms:*:164555566288:key/*"
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::164555566288:policy/TeamBoundary"
+    },
+    "bob": {
+     "tags": {
+      "team": "green"
+     },
+     "groups": [
+      "auditors"
+     ],
+     "policies": [],
+     "managed_policies": []
+    },
+    "carol": {
+     "tags": {
+      "team": "green"
+     },
+     "groups": [
+      "devs"
+     ],
+     "policies": [],
+     "managed_policies": []
+    },
+    "dave": {
+     "tags": {
+      "team": "blue"
+     },
+     "groups": [
+      "devs",
+      "auditors"
+     ],
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Deny",
+         "Action": "*",
+         "Resource": "*",
+         "Condition": {
+          "NotIpAddress": {
+           "aws:SourceIp": [
+            "10.0.0.0/8",
+            "172.16.0.0/12"
+           ]
+          }
+         }
+        },
+        {
+         "Effect": "Deny",
+         "Action": "sqs:*",
+         "Resource": "*",
+         "Condition": {
+          "ForAllValues:StringLike": {
+           "aws:TagKeys": [
+            "temp-*"
+           ]
+          }
+         }
+        },
+        {
+         "Effect": "Allow",
+         "Action": [
+          "sqs:SendMessage",
+          "sqs:ReceiveMessage"
+         ],
+         "Resource": "arn:aws:sqs:*:*:jobs"
+        }
+       ]
+      }
+     ],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::164555566288:policy/S3Boundary"
+    }
+   },
+   "groups": {
+    "devs": {
+     "policies": [
+      {
+       "Statement": {
+        "Effect": "Allow",
+        "Action": "kms:*",
+        "Resource": "*",
+        "Condition": {
+         "StringEquals": {
+          "aws:ResourceTag/team": "${aws:PrincipalTag/team}"
+         }
+        }
+       },
+       "Version": "2008-10-17"
+      }
+     ],
+     "managed_policies": [
+      "arn:aws:iam::aws:policy/ReadOnlyAccess"
+     ]
+    },
+    "auditors": {
+     "policies": [],
+     "managed_policies": [
+      "arn:aws:iam::aws:policy/ReadOnlyAccess"
+     ]
+    }
+   },
+   "roles": {
+    "ops-admin": {
+     "path": "/",
+     "tags": {
+      "team": "red"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "*",
+         "Condition": {
+          "ArnEquals": {
+           "aws:PrincipalArn": "arn:aws:iam::*:role/team/*"
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [
+      "arn:aws:iam::aws:policy/AdministratorAccess"
+     ],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Deny",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalTag/team": "red"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::164555566288:root"
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "Bool": {
+          "aws:MultiFactorAuthPresent": "true"
+         },
+         "StringEquals": {
+          "aws:PrincipalAccount": [
+           "164555566288",
+           "967247113137"
+          ]
+         }
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "deploy": {
+     "path": "/team/",
+     "tags": {
+      "team": "green"
+     },
+     "policies": [
+      {
+       "Statement": {
+        "Effect": "Allow",
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:s3:::data-6288-249/a${*}b/*"
+       },
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Deny",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalTag/team": "red"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalOrgID": "o-p9ntzv3wlz"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::164555566288:assumed-role/reader/ci"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "reader": {
+     "path": "/",
+     "tags": {
+      "team": "red"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "*",
+         "Condition": {
+          "ArnEquals": {
+           "aws:PrincipalArn": "arn:aws:iam::*:role/team/*"
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::164555566288:policy/S3Boundary",
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": [
+          "arn:aws:iam::164555566288:user/carol"
+         ]
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "164555566288"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "StringEquals": {
+          "sts:ExternalId": "ext-288"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:root"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "auditor": {
+     "path": "/team/",
+     "tags": {
+      "team": "green"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": [
+          "kms:Decrypt",
+          "kms:ScheduleKeyDeletion"
+         ],
+         "Resource": "arn:aws:kms:*:164555566288:key/*"
+        },
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::data-6288-249/*"
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::164555566288:assumed-role/reader/hop"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2008-10-17"
+     }
+    },
+    "svc-lambda": {
+     "path": "/service/",
+     "tags": {
+      "team": "red"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": [
+          "kms:Decrypt",
+          "kms:ScheduleKeyDeletion"
+         ],
+         "Resource": "arn:aws:kms:*:164555566288:key/*"
+        },
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "*",
+         "Condition": {
+          "StringLike": {
+           "aws:PrincipalArn": "arn:aws:iam::164555566288:user/a*"
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::164555566288:policy/S3Boundary",
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::164555566288:assumed-role/reader/ci"
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::407192745917:root"
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "407192745917"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "StringEquals": {
+          "sts:ExternalId": "ext-288"
+         }
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    }
+   },
+   "managed_policies": {
+    "arn:aws:iam::164555566288:policy/S3Boundary": {
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": [
+        "s3:*",
+        "sts:AssumeRole"
+       ],
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "arn:aws:iam::164555566288:policy/TeamBoundary": {
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "NotAction": "iam:*",
+       "Resource": "*"
+      },
+      {
+       "Effect": "Deny",
+       "Action": "s3:DeleteObject",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "arn:aws:iam::164555566288:policy/Shared": {
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": "sqs:*",
+       "Resource": "*",
+       "Condition": {
+        "IpAddress": {
+         "aws:SourceIp": "10.0.0.0/8"
+        }
+       }
+      },
+      {
+       "Effect": "Allow",
+       "Action": "s3:GetObject",
+       "Resource": "arn:aws:s3:::data-6288-249/*"
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "resources": [
+    {
+     "arn": "arn:aws:s3:::data-6288-249",
+     "tags": {
+      "team": "red",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:role/team/deploy"
+        },
+        "Action": "*",
+        "Resource": "*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::164555566288:root"
+        },
+        "Action": "s3:GetObject",
+        "Resource": "*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::164555566288:root"
+        },
+        "Action": "sqs:SendMessage",
+        "Resource": "*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-6288-249/reports/q1.csv",
+     "tags": {
+      "team": "red",
+      "env": "prod"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-6288-249/homes/alice/notes.txt",
+     "tags": {
+      "team": "red",
+      "env": "dev"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-6288-249/homes/bob/notes.txt",
+     "tags": {}
+    },
+    {
+     "arn": "arn:aws:s3:::data-6288-249/public/index.html",
+     "tags": {
+      "team": "green",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::789637192934:assumed-role/auditor/ci"
+        },
+        "Action": "*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:user/dave"
+        },
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-6288-249/*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-6288-249/secret/keys.txt",
+     "tags": {
+      "team": "red",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:s3:::data-6288-249/public/*"
+       }
+      ],
+      "Version": "2008-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-6288-249/a*b/literal.txt",
+     "tags": {
+      "team": "green",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "sqs:SendMessage",
+        "Resource": "arn:aws:s3:::data-6288-249/a*b/literal.txt",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalOrgID": "o-p9ntzv3wlz"
+         }
+        }
+       },
+       {
+        "Effect": "Deny",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:root"
+        },
+        "Action": "s3:DeleteObject",
+        "Resource": "arn:aws:s3:::data-6288-249/a*b/literal.txt"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:role/ops-admin"
+        },
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-6288-249/a*b/literal.txt"
+       },
+       {
+        "Effect": "Deny",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-6288-249/a*b/literal.txt",
+        "Condition": {
+         "Bool": {
+          "aws:SecureTransport": "false"
+         }
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:sqs:ap-south-1:164555566288:jobs",
+     "tags": {
+      "team": "red",
+      "env": "dev"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::164555566288:user/bob"
+        },
+        "Action": "dynamodb:GetItem",
+        "Condition": {
+         "StringEqualsIgnoreCase": {
+          "aws:PrincipalTag/team": "Blue"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "789637192934"
+        },
+        "Action": "*",
+        "Resource": "arn:aws:sqs:ap-south-1:164555566288:jobs"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::164555566288:assumed-role/deploy/ci"
+        },
+        "Action": "*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:kms:ap-south-1:164555566288:key/d53f6faf-3738-73a1-5a13-a41a4f9cf3f9",
+     "tags": {
+      "team": "red",
+      "env": "prod"
+     }
+    },
+    {
+     "arn": "arn:aws:dynamodb:ap-south-1:164555566288:table/Orders",
+     "tags": {},
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Deny",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:root"
+        },
+        "Action": "kms:ScheduleKeyDeletion",
+        "Resource": "arn:aws:dynamodb:ap-south-1:164555566288:table/*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:root"
+        },
+        "Action": "sqs:SendMessage",
+        "Resource": "arn:aws:dynamodb:ap-south-1:164555566288:table/*"
+       },
+       {
+        "Effect": "Deny",
+        "NotPrincipal": {
+         "AWS": [
+          "arn:aws:iam::164555566288:role/team/deploy",
+          "arn:aws:iam::164555566288:user/alice"
+         ]
+        },
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-6288-249/secret/*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:dynamodb:ap-south-1:164555566288:table/*",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalOrgID": "o-p9ntzv3wlz"
+         }
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:secretsmanager:ap-south-1:164555566288:secret:db/password-AbC1x2",
+     "tags": {},
+     "policy": {
+      "Statement": {
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": "arn:aws:iam::789637192934:root"
+       },
+       "Action": "*",
+       "Resource": "arn:aws:secretsmanager:ap-south-1:164555566288:secret:db/*"
+      },
+      "Version": "2012-10-17"
+     }
+    }
+   ]
+  },
+  "407192745917": {
+   "users": {
+    "alice": {
+     "tags": {
+      "team": "green",
+      "clearance": "high"
+     },
+     "groups": [],
+     "policies": [],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::407192745917:policy/TeamBoundary"
+    },
+    "bob": {
+     "tags": {},
+     "groups": [],
+     "policies": [],
+     "managed_policies": []
+    },
+    "carol": {
+     "tags": {
+      "clearance": "low"
+     },
+     "groups": [
+      "auditors"
+     ],
+     "policies": [],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::407192745917:policy/TeamBoundary"
+    },
+    "dave": {
+     "tags": {
+      "team": "green",
+      "clearance": "low"
+     },
+     "groups": [],
+     "policies": [],
+     "managed_policies": [
+      "arn:aws:iam::407192745917:policy/Missing"
+     ]
+    }
+   },
+   "groups": {
+    "devs": {
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Deny",
+         "NotResource": [
+          "arn:aws:s3:::data-5917-437",
+          "arn:aws:s3:::data-5917-437/*"
+         ],
+         "Action": "s3:*"
+        },
+        {
+         "Effect": "Allow",
+         "Action": "s3:?etObject",
+         "Resource": [
+          "arn:aws:s3:::data-5917-437",
+          "arn:aws:s3:::data-5917-437*"
+         ]
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [
+      "arn:aws:iam::aws:policy/ReadOnlyAccess"
+     ]
+    },
+    "auditors": {
+     "policies": [],
+     "managed_policies": [
+      "arn:aws:iam::aws:policy/ReadOnlyAccess"
+     ]
+    }
+   },
+   "roles": {
+    "ops-admin": {
+     "path": "/",
+     "tags": {
+      "team": "red"
+     },
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "dynamodb:*",
+         "Resource": "arn:aws:dynamodb:*:*:table/Orders",
+         "Condition": {
+          "StringEquals": {
+           "dynamodb:Attributes": [
+            "id",
+            "status",
+            "total"
+           ]
+          }
+         }
+        }
+       ],
+       "Version": "2008-10-17"
+      }
+     ],
+     "managed_policies": [
+      "arn:aws:iam::aws:policy/AdministratorAccess"
+     ],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::164555566288:root"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2008-10-17"
+     }
+    },
+    "deploy": {
+     "path": "/team/",
+     "tags": {},
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "dynamodb:*",
+         "Resource": "arn:aws:dynamodb:*:*:table/Orders",
+         "Condition": {
+          "ForAnyValue:StringEquals": {
+           "dynamodb:Attributes": [
+            "id",
+            "status",
+            "total"
+           ]
+          }
+         }
+        },
+        {
+         "Effect": "Deny",
+         "Action": "dynamodb:*",
+         "Resource": "*",
+         "Condition": {
+          "ForAnyValue:StringEquals": {
+           "dynamodb:Attributes": [
+            "ssn",
+            "card"
+           ]
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::407192745917:policy/TeamBoundary",
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "967247113137"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "StringEquals": {
+          "sts:ExternalId": "ext-917"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::407192745917:role/team/ops-admin"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "reader": {
+     "path": "/",
+     "tags": {},
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "dynamodb:*",
+         "Resource": "arn:aws:dynamodb:*:*:table/Orders",
+         "Condition": {
+          "ForAllValues:StringEquals": {
+           "dynamodb:Attributes": [
+            "id",
+            "status",
+            "total"
+           ]
+          }
+         }
+        },
+        {
+         "Effect": "Deny",
+         "Action": "s3:DeleteObject",
+         "Resource": "*",
+         "Condition": {
+          "BoolIfExists": {
+           "aws:MultiFactorAuthPresent": "false"
+          }
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::407192745917:root"
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Deny",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalTag/team": "red"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:sts::407192745917:assumed-role/deploy/hop"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "auditor": {
+     "path": "/team/",
+     "tags": {},
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:*",
+         "Resource": "*",
+         "Condition": {
+          "DateLessThan": {
+           "aws:CurrentTime": "2026-06-30T00:00:00Z"
+          }
+         }
+        },
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "*",
+         "Condition": {
+          "ArnEquals": {
+           "aws:PrincipalArn": "arn:aws:iam::*:role/team/*"
+          }
+         }
+        },
+        {
+         "Effect": "Allow",
+         "Action": "S3:Get*",
+         "Resource": [
+          "arn:aws:s3:::data-5917-437",
+          "arn:aws:s3:::data-5917-437*"
+         ]
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "*"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+         "Bool": {
+          "aws:MultiFactorAuthPresent": "true"
+         },
+         "StringEquals": {
+          "aws:PrincipalAccount": [
+           "407192745917",
+           "789637192934"
+          ]
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:root"
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    "svc-lambda": {
+     "path": "/service/",
+     "tags": {},
+     "policies": [
+      {
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::data-5917-437/homes/${aws:username, 'alice'}/*"
+        }
+       ],
+       "Version": "2012-10-17"
+      }
+     ],
+     "managed_policies": [],
+     "permissions_boundary": "arn:aws:iam::407192745917:policy/TeamBoundary",
+     "trust_policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "Service": "lambda.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": [
+          "arn:aws:iam::164555566288:user/carol"
+         ]
+        },
+        "Action": "sts:AssumeRole"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": [
+          "arn:aws:iam::407192745917:user/alice"
+         ]
+        },
+        "Action": "sts:AssumeRole"
+       }
+      ]
+     }
+    }
+   },
+   "managed_policies": {
+    "arn:aws:iam::407192745917:policy/S3Boundary": {
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": [
+        "s3:*",
+        "sts:AssumeRole"
+       ],
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "arn:aws:iam::407192745917:policy/TeamBoundary": {
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "NotAction": "iam:*",
+       "Resource": "*"
+      },
+      {
+       "Effect": "Deny",
+       "Action": "s3:DeleteObject",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "arn:aws:iam::407192745917:policy/Shared": {
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": "kms:*",
+       "Resource": "*",
+       "Condition": {
+        "StringEquals": {
+         "aws:ResourceTag/team": "${aws:PrincipalTag/team}"
+        }
+       }
+      },
+      {
+       "Effect": "Allow",
+       "Action": "s3:GetObject",
+       "Resource": "*",
+       "Condition": {
+        "StringLike": {
+         "aws:PrincipalArn": "arn:aws:iam::407192745917:user/a*"
+        }
+       }
+      }
+     ]
+    }
+   },
+   "resources": [
+    {
+     "arn": "arn:aws:s3:::data-5917-437",
+     "tags": {
+      "team": "red",
+      "env": "prod"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-5917-437/reports/q1.csv",
+     "tags": {},
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "789637192934"
+        },
+        "Action": "sqs:SendMessage",
+        "Resource": "arn:aws:s3:::data-5917-437/*"
+       },
+       {
+        "Effect": "Deny",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-5917-437/*",
+        "Condition": {
+         "Bool": {
+          "aws:SecureTransport": "false"
+         }
+        }
+       },
+       {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-5917-437/*",
+        "Condition": {
+         "StringEquals": {
+          "aws:PrincipalOrgID": "o-p9ntzv3wlz"
+         }
+        }
+       },
+       {
+        "Effect": "Deny",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-5917-437/*",
+        "Condition": {
+         "Bool": {
+          "aws:SecureTransport": "false"
+         }
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-5917-437/homes/alice/notes.txt",
+     "tags": {}
+    },
+    {
+     "arn": "arn:aws:s3:::data-5917-437/homes/bob/notes.txt",
+     "tags": {
+      "team": "blue",
+      "env": "prod"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-5917-437/public/index.html",
+     "tags": {
+      "team": "red",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Deny",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-5917-437/public/index.html",
+        "Condition": {
+         "Bool": {
+          "aws:SecureTransport": "false"
+         }
+        }
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-5917-437/secret/keys.txt",
+     "tags": {
+      "team": "green",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Deny",
+        "Principal": "*",
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-5917-437/*",
+        "Condition": {
+         "Bool": {
+          "aws:SecureTransport": "false"
+         }
+        }
+       },
+       {
+        "Effect": "Deny",
+        "NotPrincipal": {
+         "AWS": [
+          "arn:aws:iam::407192745917:role/team/deploy",
+          "arn:aws:iam::407192745917:user/alice"
+         ]
+        },
+        "Action": "*",
+        "Resource": "arn:aws:s3:::data-5917-437/secret/*"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::407192745917:root"
+        },
+        "Action": "sqs:SendMessage",
+        "Resource": "arn:aws:s3:::data-5917-437/*"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:s3:::data-5917-437/a*b/literal.txt",
+     "tags": {
+      "team": "blue",
+      "env": "dev"
+     }
+    },
+    {
+     "arn": "arn:aws:sqs:ap-south-1:407192745917:jobs",
+     "tags": {
+      "team": "blue",
+      "env": "prod"
+     },
+     "policy": {
+      "Statement": [
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:role/reader"
+        },
+        "Action": "*",
+        "Resource": "arn:aws:sqs:ap-south-1:407192745917:jobs"
+       },
+       {
+        "Effect": "Allow",
+        "Principal": {
+         "AWS": "789637192934"
+        },
+        "Action": "sqs:SendMessage",
+        "Resource": "arn:aws:sqs:ap-south-1:407192745917:jobs"
+       },
+       {
+        "Effect": "Deny",
+        "Principal": {
+         "AWS": "arn:aws:iam::789637192934:root"
+        },
+        "Action": "sqs:DeleteQueue",
+        "Resource": "arn:aws:sqs:ap-south-1:407192745917:jobs"
+       }
+      ],
+      "Version": "2012-10-17"
+     }
+    },
+    {
+     "arn": "arn:aws:kms:ap-south-1:407192745917:key/466a5712-1cf2-47e5-4f70-f1c8041153b5",
+     "tags": {
+      "team": "red",
+      "env": "prod"
+     }
+    },
+    {
+     "arn": "arn:aws:dynamodb:ap-south-1:407192745917:table/Orders",
+     "tags": {
+      "team": "blue",
+      "env": "dev"
+     }
+    },
+    {
+     "arn": "arn:aws:secretsmanager:ap-south-1:407192745917:secret:db/password-p0q9r8",
+     "tags": {
+      "team": "green",
+      "env": "prod"
+     }
+    }
+   ]
+  }
+ },
+ "aws_managed_policies": {
+  "arn:aws:iam::aws:policy/AdministratorAccess": {
+   "Version": "2012-10-17",
+   "Statement": [
+    {
+     "Effect": "Allow",
+     "Action": "*",
+     "Resource": "*"
+    }
+   ]
+  },
+  "arn:aws:iam::aws:policy/ReadOnlyAccess": {
+   "Version": "2012-10-17",
+   "Statement": [
+    {
+     "Effect": "Allow",
+     "Action": [
+      "s3:Get*",
+      "s3:List*",
+      "sqs:Get*",
+      "dynamodb:GetItem",
+      "dynamodb:Query",
+      "kms:Describe*"
+     ],
+     "Resource": "*"
+    }
+   ]
+  }
+ },
+ "organization": {
+  "id": "o-p9ntzv3wlz",
+  "management_account": "789637192934",
+  "policies": {
+   "FullAWSAccess": {
+    "Version": "2012-10-17",
+    "Statement": [
+     {
+      "Effect": "Allow",
+      "Action": "*",
+      "Resource": "*"
+     }
+    ]
+   },
+   "AllowCoreServices": {
+    "Version": "2012-10-17",
+    "Statement": [
+     {
+      "Effect": "Allow",
+      "Action": [
+       "s3:*",
+       "sqs:*",
+       "sts:*",
+       "kms:*",
+       "iam:Get*"
+      ],
+      "Resource": "*"
+     }
+    ]
+   },
+   "DenyKmsDeletion": {
+    "Version": "2012-10-17",
+    "Statement": [
+     {
+      "Effect": "Deny",
+      "Action": [
+       "kms:ScheduleKeyDeletion",
+       "kms:Disable*"
+      ],
+      "Resource": "*"
+     }
+    ]
+   },
+   "RegionLock": {
+    "Version": "2012-10-17",
+    "Statement": [
+     {
+      "Effect": "Deny",
+      "NotAction": [
+       "iam:*",
+       "sts:*"
+      ],
+      "Resource": "*",
+      "Condition": {
+       "StringNotEquals": {
+        "aws:RequestedRegion": [
+         "ap-south-1"
+        ]
+       }
+      }
+     }
+    ]
+   },
+   "DenyUnlessMfaForDeletes": {
+    "Version": "2012-10-17",
+    "Statement": [
+     {
+      "Effect": "Deny",
+      "Action": [
+       "s3:DeleteObject",
+       "dynamodb:DeleteItem"
+      ],
+      "Resource": "*",
+      "Condition": {
+       "BoolIfExists": {
+        "aws:MultiFactorAuthPresent": "false"
+       }
+      }
+     }
+    ]
+   }
+  },
+  "root": {
+   "id": "r-6fe2",
+   "scps": [
+    "FullAWSAccess",
+    "DenyKmsDeletion"
+   ],
+   "accounts": [
+    {
+     "id": "789637192934",
+     "scps": []
+    }
+   ],
+   "children": [
+    {
+     "id": "ou-prod",
+     "scps": [
+      "AllowCoreServices"
+     ],
+     "accounts": [
+      {
+       "id": "967247113137",
+       "scps": [
+        "FullAWSAccess"
+       ]
+      }
+     ],
+     "children": []
+    },
+    {
+     "id": "ou-dev",
+     "scps": [
+      "FullAWSAccess",
+      "RegionLock"
+     ],
+     "accounts": [
+      {
+       "id": "164555566288",
+       "scps": [
+        "FullAWSAccess"
+       ]
+      }
+     ],
+     "children": []
+    }
+   ]
+  }
+ }
+}

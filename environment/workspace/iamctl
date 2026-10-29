@@ -1,0 +1,5 @@
+#!/bin/sh
+# Entry point: iamctl SNAPSHOT.json QUERIES.jsonl > ANSWERS.jsonl
+# Replace this with your engine (see /app/SPEC.md).
+echo "iamctl: not implemented" >&2
+exit 1

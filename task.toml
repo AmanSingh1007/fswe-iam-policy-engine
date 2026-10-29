@@ -1,0 +1,54 @@
+schema_version = "1.3"
+
+[task]
+name = "rustlabs/iam-policy-engine"
+description = "Build a cloud IAM authorization engine and access analyzer (SCPs, boundaries, session and resource policies, conditions, variables, role-assumption reachability) graded on freshly generated organizations."
+keywords = ["iam", "cloud-security", "authorization", "policy-evaluation", "access-analysis", "frontierswe"]
+
+[metadata]
+difficulty = "hard"
+category = "cybersecurity"
+subcategory = "iam-and-cloud-security"
+expert_time_estimate_hours = 12
+difficulty_explanation = """
+The engine is graded on six organizations generated at grading time, roughly two thousand authorization, \
+role-reachability and who-can queries, and must be exactly right on all of them. The spec is complete, but \
+correctness hinges on a long list of interacting rules that each look like a detail: the role path is in the \
+role ARN but not in the session ARN; a resource policy that names a session ARN bypasses the permissions \
+boundary and session policy while one naming the role ARN does not; naming an account root only delegates; \
+cross-account access needs both sides; every SCP level must allow and the management account is exempt; \
+ForAllValues is true on a missing key while negated operators are true on a missing key without IfExists; \
+variables resolve only under Version 2012-10-17, ${*} is a literal star, defaults apply, unresolved variables \
+match nothing; a NotPrincipal role ARN does not exempt its sessions; requester-supplied principal tags are \
+discarded; ArnEquals honours wildcards; an unknown boundary allows nothing. The public examples omit the planted \
+corner cases, so passing them is not evidence of passing the grader.
+"""
+solution_explanation = """
+A direct implementation of SPEC.md: build the request context per principal and resource, match statements \
+(segment-wise ARN wildcards, case-insensitive actions, conditions with set qualifiers and IfExists), gather \
+explicit denies across identity, boundary, session, SCP and resource policies, gate on every SCP level, then \
+apply the same-account / cross-account grant rules with principal-match kinds (direct, role, account). \
+reachable_roles is a BFS over sts:AssumeRole decisions with fresh hop sessions; who_can enumerates users and \
+'who' sessions of every role.
+"""
+verification_explanation = """
+The verifier generates six scenarios from a fresh seed (random four-to-five-account organizations plus planted \
+corner-case fixtures), answers them with a hidden reference engine, runs /app/iamctl on each as the \
+unprivileged agent user (300 s per scenario), and requires every answer to match exactly: decision strings for \
+authorize, sorted ARN lists for reachable_roles and who_can, no missing, extra or malformed lines, exit 0. Reward \
+is 1 only if all six scenarios match.
+"""
+
+[agent]
+timeout_sec = 72000.0
+user = "agent"
+
+[verifier]
+timeout_sec = 3600.0
+
+[environment]
+build_timeout_sec = 900.0
+cpus = 2
+memory_mb = 4096
+storage_mb = 10240
+network_mode = "no-network"
